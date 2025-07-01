@@ -15,7 +15,7 @@ def start_test():
     target = entry_target.get()
     duration = entry_duration.get()
     concurrency = entry_concurrency.get()
-    payload = entry_payload.get()
+    payload = "10KB"  # Imposta SEMPRE 10KB
 
     if not target:
         messagebox.showerror("Errore", "Inserisci un URL o IP valido.")
@@ -26,7 +26,7 @@ def start_test():
         target,
         "-d", duration,
         "-c", concurrency,
-        "--payload-size", payload,
+        "--payload-size", payload,    # Non più variabile, sempre 10KB
         "--log-level", "INFO"
     ]
 
@@ -35,14 +35,12 @@ def start_test():
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             processes.append(process)
 
-            # Avvia log finti
             t2 = threading.Thread(target=lambda: fake_log(output_box_fake2), daemon=True)
             t3 = threading.Thread(target=lambda: fake_log(output_box_fake3), daemon=True)
             t2.start()
             t3.start()
             fake_threads.extend([t2, t3])
 
-            # Output reale
             for line in iter(process.stdout.readline, ''):
                 output_box_main.insert(tk.END, line)
                 output_box_main.see(tk.END)
@@ -59,7 +57,7 @@ def fake_log(box):
         lambda: f"Ping risposta: {random.randint(30, 300)}ms",
         lambda: "Timeout dalla destinazione...",
         lambda: f"Connessione stabilita con {entry_target.get()}",
-        lambda: f"Inviata sequenza dati di {entry_payload.get()}",
+        lambda: f"Inviata sequenza dati di 10KB",    # Sempre 10KB
         lambda: "Connessione chiusa dal server.",
     ]
     while any(p.poll() is None for p in processes):
@@ -86,7 +84,6 @@ font_title = ("OCR A Extended", 25, "bold")
 
 tk.Label(root, text="A P O C A L Y P S E", font=font_title, fg="red", bg="#0d0d0d").pack(pady=10)
 
-
 # Input frame
 frame_options = tk.Frame(root, bg="#0d0d0d", highlightbackground="red", highlightthickness=2, padx=10, pady=10)
 frame_options.pack(pady=10, fill="x", padx=20)
@@ -102,7 +99,7 @@ def add_entry(label_text, default=""):
 entry_target = add_entry("Target URL o IP:")
 entry_duration = add_entry("Durata (s):", "60")
 entry_concurrency = add_entry("Concorrenza:", "2000")
-entry_payload = add_entry("Payload Size (es. 10KB o 10MB):", "10MB")
+# RIMOSSO il campo Payload Size
 
 # Console frame
 frame_dos = tk.Frame(root, bg="#0d0d0d")
